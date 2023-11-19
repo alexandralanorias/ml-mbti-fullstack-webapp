@@ -64,8 +64,8 @@ function App() {
 
   return (
     <div className="App">
-      <h1>MBTI Personality Prediction</h1>
-      <h2>Predict your MBTI via Machine Learning Models!</h2>
+      <h1>mbtify</h1>
+      <h3>&#123;<i>  a twitter mbti personality predictor</i>  &#125;</h3>
       <div className="prediction_container">
         <div className="text_container">
           <label>Input Text:</label>

@@ -6,10 +6,13 @@
   margin: auto;
   color: #353333;
   /* Colors from: https://www.schemecolor.com/pastel-gradient.php */
-  background: linear-gradient(217deg, rgba(156, 220, 170,.8), rgba(150, 202, 247,0) 70.71%),
+  background-image: linear-gradient(to right top, #f5f5f5, #f3f1f4, #f2edf2, #f2e9ef, #f3e4ea, #efdfe6, #ead9e2, 
+    #e6d4de, #d9cedb, #ccc8d6, #bec2d0, #b2bcc8);
+  /*background: linear-gradient(217deg, rgba(156, 220, 170,.8), rgba(150, 202, 247,0) 70.71%),
   linear-gradient(127deg, rgba(191, 178, 243,.8), rgba(229, 225, 171,0) 70.71%),
-  linear-gradient(336deg, rgba(243, 198, 165,.8), rgba(248, 163, 168,0) 70.71%);
+  linear-gradient(336deg, rgba(243, 198, 165,.8), rgba(248, 163, 168,0) 70.71%);*/
   height: 100vh;
+  padding-top: 32px;
 }
 
 .prediction_container {
