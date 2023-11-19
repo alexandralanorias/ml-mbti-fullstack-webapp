@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300&family=Noto+Sans&family=Roboto:wght@500&display=swap'); 
+
+:root {
+  font-family: 'Lato', sans-serif;
+}
+
+button {
+  font-family: 'Roboto', sans-serif;
+}
+
+select {
+  font-family: 'Roboto', sans-serif;
+}
+
+select > option {
+  font-family: 'Roboto', sans-serif;
+}
+
+body {
+  margin: 0;
+}

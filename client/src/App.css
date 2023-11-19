@@ -1,0 +1,67 @@
+.App {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: auto;
+  color: #353333;
+  /* Colors from: https://www.schemecolor.com/pastel-gradient.php */
+  background: linear-gradient(217deg, rgba(156, 220, 170,.8), rgba(150, 202, 247,0) 70.71%),
+  linear-gradient(127deg, rgba(191, 178, 243,.8), rgba(229, 225, 171,0) 70.71%),
+  linear-gradient(336deg, rgba(243, 198, 165,.8), rgba(248, 163, 168,0) 70.71%);
+  height: 100vh;
+}
+
+.prediction_container {
+  background: rgb(243, 236, 226);
+  width: 50%;
+  margin: auto;
+  border: black 1px solid;
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
+  padding-bottom: 1.5rem;
+  margin-bottom: 1rem;;
+}
+
+.text_container {
+  margin: 1rem;
+  display: flex;
+  flex-direction: column;
+  font-size: 20px;
+}
+
+.button_container  {
+  margin: 1rem;
+  display: flex;
+  flex-direction: row;
+  padding: 0.2rem;
+  font-size: 18px;
+}
+
+.button_container > button {
+  margin-left: 0.5rem;
+}
+
+.model_container {
+  margin: 1rem;
+  display: flex;
+  flex-direction: row;
+  padding: 0.2rem;
+  font-size: 18px;
+}
+
+.model_container > select {
+  margin-left: 0.5rem;
+}
+
+.response_container {
+  margin: 1rem;
+  color: #777777;
+  font-weight: 600;
+}
+
+.submitbutton_container {
+  margin: 1rem;
+}
