@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, make_response
 from flask_restx import Api, Resource, fields
+from flask_cors import CORS
 import joblib
 import numpy as np
 import pandas as pd
@@ -16,6 +17,7 @@ from sklearn.feature_extraction.text import TfidfTransformer
 
 # FLASK APP
 flask_app = Flask(__name__)
+CORS(flask_app, resources={r"/*": {"origins": "*"}})
 app = Api(app=flask_app,
           version="1.0",
           title="ML React App",
@@ -38,9 +40,9 @@ nltk.download('omw-1.4')
 
 # Load classifier from Joblib
 # Loading Machine Learning Model
-cntizer = joblib.load("joblib/cntizer.pkl")  # Load pre-trained CountVectorizer
+cntizer = joblib.load("joblib/cntizer2.pkl")  # Load pre-trained CountVectorizer
 # Load pre-trained TF-IDF Transformer
-tfizer = joblib.load("joblib/tfizer.pkl")
+tfizer = joblib.load("joblib/tfizer2.pkl")
 
 lemmatizer = WordNetLemmatizer()
 stops = stopwords.words('english')
@@ -51,8 +53,6 @@ b_Pers_list = [{0: 'I', 1: 'E'}, {0: 'N', 1: 'S'},
 # END OF INITIALIZATION
 
 # API ROUTES
-
-
 @name_space.route("/")
 class MainClass(Resource):
 
@@ -73,19 +73,21 @@ class MainClass(Resource):
             mydata = pd.DataFrame(data={'type': ['INFJ'], 'posts': [data[0]]})
 
             if (data[1] == 1):
-                classifier_IE = joblib.load("joblib/model_IE:_Introversion_(I)___Extroversion_(E).joblib")
-                classifier_NS = joblib.load("joblib/model_NS:_Intuition_(N)_–_Sensing_(S).joblib")
-                classifier_FT = joblib.load("joblib/model_FT:_Feeling_(F)_-_Thinking_(T).joblib")
-                classifier_JP = joblib.load("joblib/model_JP:_Judging_(J)_–_Perceiving_(P).joblib")
+                classifier_IE = joblib.load("joblib/model_IE_sm.joblib")
+                classifier_NS = joblib.load("joblib/model_NS_sm.joblib")
+                classifier_FT = joblib.load("joblib/model_FT_sm.joblib")
+                classifier_JP = joblib.load("joblib/model_JP_sm.joblib")
                 print("SVC Loaded")
-            else:
-                classifier = joblib.load("joblib/rfbestmbticlassifier.joblib")
-                print("RandomForest Loaded")
+            # else:
+            #     classifier = joblib.load("joblib/rfbestmbticlassifier.joblib")
+            #     print("RandomForest Loaded")
 
-            my_posts, dummy = pre_process_text(
-                mydata, remove_stop_words=True, remove_mbti_profiles=True)
 
-            print("Preprocessed",my_posts)
+            clean_posts(mydata)
+            my_posts, dummy = map(
+                mydata)
+
+            print("Preprocessed", my_posts)
 
             my_X_cnt = cntizer.transform(my_posts)
             # print(my_X_cnt)
@@ -138,6 +140,92 @@ def translate_back(personality):
     for i, l in enumerate(personality):
         s += b_Pers_list[i][l]
     return s
+
+def clean_posts(personality_data):
+    # converting posts into lower case
+    personality_data["clean_posts"] = personality_data["posts"].str.lower()
+
+    # replacing ||| with space
+    personality_data["clean_posts"] = personality_data["clean_posts"].str.replace(
+        re.compile(r"\|\|\|"), " "
+    )
+
+    # # Translate emoticons
+    # for emot, meaning in EMOTICONS.items():
+    #     personality_data["clean_posts"] = personality_data["clean_posts"].replace(
+    #         emot, meaning + " "
+    #     )
+    # # Translate all emojis.
+    # for emoji, meaning in UNICODE_EMO.items():
+    #         personality_data["clean_posts"] = personality_data["clean_posts"].replace(
+    #             emoji, meaning + " "
+    #         )
+
+    # replacing urls with domain name
+    personality_data["clean_posts"] = personality_data["clean_posts"].str.replace(
+        re.compile(r"https?:\/\/(www)?.?([A-Za-z_0-9-]+)([\S])*"), ""
+    )
+    
+
+    # dropping emails
+    personality_data["clean_posts"] = personality_data["clean_posts"].str.replace(
+        re.compile(r"\S+@\S+"), ""
+    )
+
+    # dropping punctuations
+    personality_data["clean_posts"] = personality_data["clean_posts"].str.replace(
+        re.compile(r"[^a-z\s]"), " "
+    )
+
+    # dropping MBTIs mentioned in the posts. There are quite a few mention of these types in these posts.
+    mbti = personality_data["type"].unique()
+    for type_word in mbti:
+        personality_data["clean_posts"] = personality_data["clean_posts"].str.replace(
+            type_word.lower(), ""
+        )
+
+    # removing words that are 1 to 2 characters long
+    personality_data["clean_posts"] = personality_data["clean_posts"].str.replace(
+        re.compile(r"\b\w{1,2}\b"), ""
+    )
+
+    # lemmitizing
+    lemmatizer = WordNetLemmatizer()
+
+    personality_data["clean_posts"] = personality_data["clean_posts"].apply(
+        lambda x: " ".join(
+            [
+                lemmatizer.lemmatize(word)
+                for word in x.split(" ")
+                if word not in stopwords.words("english")
+            ]
+        )
+    )
+    
+    personality_data["clean_posts"] = personality_data["clean_posts"].str.replace("\n", " ")
+
+
+def map(data):
+
+    list_personality = []
+    list_posts = []
+    len_data = len(data)
+    i=0
+    
+    for row in data.iterrows():
+        i+=1
+        if (i % 500 == 0 or i == 1 or i == len_data):
+            print("%s of %s rows" % (i, len_data))
+
+        posts = row[1].clean_posts
+
+        type_labelized = translate_personality(row[1].type)
+        list_personality.append(type_labelized)
+        list_posts.append(posts)
+
+    list_posts = np.array(list_posts)
+    list_personality = np.array(list_personality)
+    return list_posts, list_personality
 
 
 def pre_process_text(data, remove_stop_words=True, remove_mbti_profiles=True):
