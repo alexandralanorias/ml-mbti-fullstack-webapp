@@ -73,7 +73,10 @@ class MainClass(Resource):
             mydata = pd.DataFrame(data={'type': ['INFJ'], 'posts': [data[0]]})
 
             if (data[1] == 1):
-                classifier = joblib.load("joblib/svcbestmbticlassifier.joblib")
+                classifier_IE = joblib.load("joblib/model_IE:_Introversion_(I)___Extroversion_(E).joblib")
+                classifier_NS = joblib.load("joblib/model_NS:_Intuition_(N)_–_Sensing_(S).joblib")
+                classifier_FT = joblib.load("joblib/model_FT:_Feeling_(F)_-_Thinking_(T).joblib")
+                classifier_JP = joblib.load("joblib/model_JP:_Judging_(J)_–_Perceiving_(P).joblib")
                 print("SVC Loaded")
             else:
                 classifier = joblib.load("joblib/rfbestmbticlassifier.joblib")
@@ -92,8 +95,19 @@ class MainClass(Resource):
             # ML Predictions
             prediction_result = []
             for l in range(4):
-                y_pred = classifier.predict(my_X_tfidf)
-                prediction_result.append(y_pred[0])
+                if l == 0:
+                    y_pred = classifier_IE.predict(my_X_tfidf)
+                    prediction_result.append(y_pred[0])
+                elif l == 1:
+                    y_pred = classifier_NS.predict(my_X_tfidf)
+                    prediction_result.append(y_pred[0])
+                elif l == 2:
+                    y_pred = classifier_FT.predict(my_X_tfidf)
+                    prediction_result.append(y_pred[0])
+                elif l == 3:
+                    y_pred = classifier_JP.predict(my_X_tfidf)
+                    prediction_result.append(y_pred[0])
+                
 
             print("Prediction Result:", prediction_result)
 
